@@ -1,4 +1,10 @@
-﻿namespace System.Web.OData
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData;
+using ServiceLifetime = Microsoft.OData.ServiceLifetime;
+
+namespace System.Web.OData
 {
     using Batch;
     using Builder;
@@ -17,6 +23,9 @@
 
     public class HttpConfigurationExtensionsTest
     {
+
+        private const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
+
         [ApiVersion( "1.0" )]
         private sealed class ControllerV1 : ODataController
         {
@@ -44,27 +53,40 @@
         public void map_versioned_odata_routes_should_return_expected_result()
         {
             // arrange
-            var configuration = new HttpConfiguration();
-            var httpServer = new HttpServer( configuration );
-            var routeName = "odata";
-            var routePrefix = "api/v3";
-            var model = new ODataModelBuilder().GetEdmModel();
-            var apiVersion = new ApiVersion( 3, 0 );
-            var batchHandler = new DefaultODataBatchHandler( httpServer );
+            try
+            {
+                var configuration = new HttpConfiguration();
+                var httpServer = new HttpServer(configuration);
+                var routeName = "odata";
+                var routePrefix = "api/v3";
+                var model = new ODataModelBuilder().GetEdmModel();
+                var apiVersion = new ApiVersion(3, 0);
+                var batchHandler = new DefaultODataBatchHandler(httpServer);
+                Action<IContainerBuilder> odataContainerBuilder = (builder => builder.AddService<ODataBatchHandler>(ServiceLifetime.Singleton, sp => batchHandler));
 
-            // act
-            var route = configuration.MapVersionedODataRoute( routeName, routePrefix, model, apiVersion, batchHandler );
-            var constraint = (VersionedODataPathRouteConstraint) route.PathRouteConstraint;
-            var batchRoute = configuration.Routes["odataBatch"];
+                // act
+                var route = configuration.MapVersionedODataRoute(routeName, routePrefix, model, apiVersion, odataContainerBuilder);
+                var constraint = (VersionedODataPathRouteConstraint)route.PathRouteConstraint;
+                var batchRoute = configuration.Routes["odataBatch"];
 
-            // assert
-            constraint.RoutingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
-            constraint.RoutingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
-            constraint.RoutingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
-            constraint.RouteName.Should().Be( routeName );
-            route.RoutePrefix.Should().Be( routePrefix );
-            batchRoute.Handler.Should().Be( batchHandler );
-            batchRoute.RouteTemplate.Should().Be( "api/v3/$batch" );
+                var serviceProviders = (ConcurrentDictionary<string, IServiceProvider>)configuration.Properties[RootContainerMappingsKey];
+                var serviceProvider = serviceProviders[routeName];
+                var routingConventions = serviceProvider.GetServices<IODataRoutingConvention>().ToArray();
+
+                // assert
+                routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
+                routingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
+                routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
+                constraint.RouteName.Should().Be(routeName);
+                route.RoutePrefix.Should().Be(routePrefix);
+                batchRoute.Handler.Should().Be(batchHandler);
+                batchRoute.RouteTemplate.Should().Be("api/v3/$batch");
+            }
+            catch (Exception exception)
+            {
+                Console.Write(exception);
+                throw;
+            }
         }
 
         [Fact]
@@ -79,7 +101,8 @@
             var models = CreateModels( configuration );
 
             // act
-            var routes = configuration.MapVersionedODataRoutes( routeName, routePrefix, models, batchHandler );
+            Action<IContainerBuilder> odataContainerBuilder = (builder => builder.AddService<ODataBatchHandler>(ServiceLifetime.Singleton, sp => batchHandler));
+            var routes = configuration.MapVersionedODataRoutes( routeName, routePrefix, odataContainerBuilder, models);
             var batchRoute = configuration.Routes["odataBatch"];
 
             // assert
@@ -95,9 +118,13 @@
                 var apiVersion = constraint.EdmModel.GetAnnotationValue<ApiVersionAnnotation>( constraint.EdmModel ).ApiVersion;
                 var versionedRouteName = routeName + "-" + apiVersion.ToString();
 
-                constraint.RoutingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
-                constraint.RoutingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
-                constraint.RoutingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
+                var serviceProviders = (ConcurrentDictionary<string, IServiceProvider>)configuration.Properties[RootContainerMappingsKey];
+                var serviceProvider = serviceProviders[versionedRouteName];
+                var routingConventions = serviceProvider.GetServices<IODataRoutingConvention>().ToArray();
+
+                routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
+                routingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
+                routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
                 constraint.RouteName.Should().Be( versionedRouteName );
                 route.RoutePrefix.Should().Be( routePrefix );
             }

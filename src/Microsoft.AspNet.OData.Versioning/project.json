@@ -1,4 +1,4 @@
-﻿{
+{
     "version": "2.0.1-*",
     "authors": [ "Microsoft" ],
     "title": "Microsoft ASP.NET Web API Versioning for OData v4.0",
@@ -7,7 +7,7 @@
     "language": "en",
 
     "dependencies": {
-        "Microsoft.AspNet.OData": "[5.9.1,6.0.0)",
+        "Microsoft.AspNet.OData": "6.0.0",
         "Microsoft.AspNet.WebApi.Versioning": "2.0.3-*"
     },
 

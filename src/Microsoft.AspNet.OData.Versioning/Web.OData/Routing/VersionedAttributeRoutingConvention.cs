@@ -15,47 +15,57 @@
     /// </summary>
     public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
     {
+        private IEdmModel EdmModel { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="edmModel">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">Name of the route.</param>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration )
-            : base( model, configuration )
+        public VersionedAttributeRoutingConvention(IEdmModel edmModel, string routeName, HttpConfiguration configuration )
+            : base(routeName, configuration )
         {
+            EdmModel = edmModel;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="edmModel">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">Name of the route.</param>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler )
-            : base( model, configuration, pathTemplateHandler )
+        public VersionedAttributeRoutingConvention( IEdmModel edmModel, string routeName, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler )
+            : base(routeName, configuration, pathTemplateHandler )
         {
+            EdmModel = edmModel;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="edmModel">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">Name of the route.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see></param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers )
-            : base( model, controllers )
+        public VersionedAttributeRoutingConvention( IEdmModel edmModel, string routeName, IEnumerable<HttpControllerDescriptor> controllers )
+            : base(routeName, controllers )
         {
+            EdmModel = edmModel;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="edmModel">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">Name of the route.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see>
         /// associated with the routing convention.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler )
-            : base( model, controllers, pathTemplateHandler )
+        public VersionedAttributeRoutingConvention( IEdmModel edmModel, string routeName, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler )
+            : base(routeName, controllers, pathTemplateHandler )
         {
+            EdmModel = edmModel;
         }
 
         /// <summary>
@@ -76,7 +86,7 @@
                 return true;
             }
 
-            var apiVersion = Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion;
+            var apiVersion = EdmModel.GetAnnotationValue<ApiVersionAnnotation>( EdmModel )?.ApiVersion;
 
             return apiVersion != null && versionModel.DeclaredApiVersions.Contains( apiVersion );
         }

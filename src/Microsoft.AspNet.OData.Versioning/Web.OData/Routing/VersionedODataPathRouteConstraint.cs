@@ -18,23 +18,22 @@
     public class VersionedODataPathRouteConstraint : ODataPathRouteConstraint
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="VersionedODataPathRouteConstraint" /> class.
+        /// The <see cref="IEdmModel">EDM model</see>.
         /// </summary>
-        /// <param name="pathHandler">The OData path handler to use for parsing.</param>
-        /// <param name="model">The EDM model to use for parsing the path.</param>
-        /// <param name="routeName">The name of the route this constraint is associated with.</param>
-        /// <param name="routingConventions">The OData routing conventions to use for selecting the controller name.</param>
+        /// <value>The edm model.</value>
+        public IEdmModel EdmModel { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VersionedODataPathRouteConstraint" /> class.
+        /// </summary>        
+        /// <param name="edmModel">The <see cref="IEdmModel">EDM model</see> associated with the route constraint.</param>
+        /// <param name="routeName">The name of the route this constraint is associated with.</param>        
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the route constraint.</param>
-        public VersionedODataPathRouteConstraint(
-            IODataPathHandler pathHandler,
-            IEdmModel model,
-            string routeName,
-            IEnumerable<IODataRoutingConvention> routingConventions,
-            ApiVersion apiVersion )
-            : base( pathHandler, model, routeName, routingConventions )
+        public VersionedODataPathRouteConstraint(IEdmModel edmModel, string routeName, ApiVersion apiVersion ) : base(routeName)
         {
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             ApiVersion = apiVersion;
+            EdmModel = edmModel;
         }
 
         private static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values )
@@ -60,7 +59,7 @@
         /// <param name="routeDirection">The route direction.</param>
         /// <returns>True if this instance equals a specified route; otherwise, false.</returns>
         [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        public override bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
+        public override bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
         {
             Arg.NotNull( request, nameof( request ) );
             Arg.NotNull( values, nameof( values ) );

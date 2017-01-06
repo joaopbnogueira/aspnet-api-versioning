@@ -132,9 +132,9 @@
             {
                 var builder = ModelBuilderFactory();
 
-                foreach ( var configuration in configurations )
+                foreach ( var config in configurations )
                 {
-                    configuration.Apply( builder, apiVersion );
+                    config.Apply( builder, apiVersion );
                 }
 
                 var model = builder.GetEdmModel();

@@ -44,15 +44,16 @@
         public void should_map_controller_should_return_true_for_versionX2Dneutral_controller()
         {
             // arrange
+            var routeName = "odata";
             var model = new ODataModelBuilder().GetEdmModel();
-            var controller = new HttpControllerDescriptor( new HttpConfiguration(), string.Empty, typeof( NeutralController ) );
-            var convention = new VersionedAttributeRoutingConvention( model, new HttpControllerDescriptor[0] );
-            var annotation = new ApiVersionAnnotation( new ApiVersion( 1, 0 ) );
+            var controller = new HttpControllerDescriptor(new HttpConfiguration(), string.Empty, typeof(NeutralController));
+            var convention = new VersionedAttributeRoutingConvention(model, routeName, new HttpControllerDescriptor[0]);
+            var annotation = new ApiVersionAnnotation(new ApiVersion(1, 0));
 
-            model.SetAnnotationValue( model, annotation );
+            model.SetAnnotationValue(model, annotation);
 
             // act
-            var result = convention.ShouldMapController( controller );
+            var result = convention.ShouldMapController(controller);
 
             // assert
             result.Should().BeTrue();
@@ -64,18 +65,19 @@
         public void should_map_controller_should_return_expected_result_for_controller_version( int majorVersion, bool expected )
         {
             // arrange
+            var routeName = "odata";
             var model = new ODataModelBuilder().GetEdmModel();
-            var controller = new HttpControllerDescriptor( new HttpConfiguration(), string.Empty, typeof( ControllerV1 ) );
-            var convention = new VersionedAttributeRoutingConvention( model, new HttpControllerDescriptor[0] );
-            var annotation = new ApiVersionAnnotation( new ApiVersion( majorVersion, 0 ) );
+            var controller = new HttpControllerDescriptor(new HttpConfiguration(), string.Empty, typeof(ControllerV1));
+            var convention = new VersionedAttributeRoutingConvention(model, routeName, new HttpControllerDescriptor[0]);
+            var annotation = new ApiVersionAnnotation(new ApiVersion(majorVersion, 0));
 
-            model.SetAnnotationValue( model, annotation );
+            model.SetAnnotationValue(model, annotation);
 
             // act
-            var result = convention.ShouldMapController( controller );
+            var result = convention.ShouldMapController(controller);
 
             // assert
-            result.Should().Be( expected );
+            result.Should().Be(expected);
         }
     }
 }

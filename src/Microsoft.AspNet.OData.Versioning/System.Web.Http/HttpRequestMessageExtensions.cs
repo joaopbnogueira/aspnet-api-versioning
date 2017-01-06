@@ -1,7 +1,7 @@
 ﻿namespace System.Web.Http
 {
     using Diagnostics.Contracts;
-    using Microsoft.OData.Core;
+    using Microsoft.OData;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System.Net.Http;

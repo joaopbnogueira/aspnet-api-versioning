@@ -1,17 +1,17 @@
-﻿{
+{
     "version": "1.0.0-*",
 
     "dependencies": {
-        "Microsoft.AspNet.OData": "5.9.1",
         "FluentAssertions": "4.12.0",
         "more.xunit": "2.1.0",
-        "xunit.runner.visualstudio": "2.1.0",
         "Moq": "4.5.16",
         "Microsoft.AspNet.WebApi.Core": "5.2.3",
         "Microsoft.AspNet.OData.Versioning": {
             "target": "project",
             "version": ""
-        }
+        },
+        "Microsoft.AspNet.OData": "6.0.0",
+        "xunit.runner.visualstudio": "2.1.0"
     },
 
     "frameworks": {

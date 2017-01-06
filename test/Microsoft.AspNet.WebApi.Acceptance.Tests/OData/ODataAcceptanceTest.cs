@@ -11,12 +11,12 @@
     [Trait( "Framework", "OData" )]
     public abstract class ODataAcceptanceTest : AcceptanceTest
     {
-        protected ODataAcceptanceTest()
-        {
-            FilteredControllerTypes.Add( typeof( VersionedMetadataController ) );
-            Configuration.EnableCaseInsensitive( true );
-            Configuration.EnableUnqualifiedNameCall( true );
-        }
+        //protected ODataAcceptanceTest()
+        //{
+        //    FilteredControllerTypes.Add( typeof( VersionedMetadataController ) );
+        //    Configuration.EnableCaseInsensitive( true );
+        //    Configuration.EnableUnqualifiedNameCall( true );
+        //}
 
         [Fact]
         public async Task _service_document_should_return_result_without_api_version()
